@@ -3,7 +3,7 @@
 #include <BLEUtils.h>
 
 // Hardcoded MAC address of the timer — change this to match your device
-#define TIMER_MAC "AA:BB:CC:DD:EE:FF"
+#define TIMER_MAC "60:09:C3:82:1D:8D"
 
 // Nordic UART Service UUIDs
 static BLEUUID NUS_SERVICE_UUID ("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
