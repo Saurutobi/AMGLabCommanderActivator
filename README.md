@@ -3,7 +3,7 @@ A set of Arduino apps for use with the AmgLab Commander Timer for use in Practic
 
 ## Requirements
 - An AmgLab Commander
-- Arduino with Bluetooth. Arduino Nano 33 BLE Rev3 model used to develop project
+- Arduino with Bluetooth. Arduino Nano 33 BLE Rev2 model used to develop project
 - Various microcontroller parts, buttons, relays, powersupplies, etc ***********fill out with stuff
 
 ## Projects
