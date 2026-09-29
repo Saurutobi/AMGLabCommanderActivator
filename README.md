@@ -21,3 +21,12 @@ A mechanism for the Timer to activate the Arduino, which then performs a series 
 
 ### Others
 These projects can be extended to do various actions, they don't need to just need to do the one action they come with. The Visual Start could be mixed with the Delayed Activator, they could activate 3 different actions not just one.
+
+
+## How To
+- clone this repo
+- open a `.ino` in Arduino Studio
+- plug in your arduino, select it in the boardmanager
+- edit the timer address to your timer
+- upload the sketch
+- connect button and test
