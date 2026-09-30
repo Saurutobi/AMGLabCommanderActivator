@@ -11,7 +11,9 @@
  * Library: ArduinoBLE.
  * Button : D2, active low with the internal pull-up. Wire a push button
  *          between D2 and GND.
- * LED    : the built-in LED is on while the timer link is active.
+ * LED    : the built-in LED and an external LED on D3 are on while the timer
+ *          link is active. Wire D3 -> 1 kOhm resistor -> LED anode (long leg),
+ *          LED cathode (short leg) -> GND.
  */
 
 #include <ArduinoBLE.h>
@@ -23,6 +25,8 @@ static const char *TARGET_TIMER_NAME = "AMG Lab COMM 1D8D";
 
 static const uint8_t START_BUTTON_PIN = 2;
 static const unsigned long BUTTON_DEBOUNCE_MS = 50;
+
+static const uint8_t CONNECTED_LED_PIN = 3;
 
 static const char *SERVICE_UUID     = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 static const char *WRITE_CHAR_UUID  = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
@@ -66,6 +70,11 @@ static void logTimerPacket(const uint8_t *data, int length) {
 // -----------------------------------------------------------------------------
 // Connection helpers
 // -----------------------------------------------------------------------------
+static void setConnectedLed(bool on) {
+  digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
+  digitalWrite(CONNECTED_LED_PIN, on ? HIGH : LOW);
+}
+
 static void startScan() {
   if (scanning) return;
   Serial.print("[Scan] Searching for \"");
@@ -80,7 +89,7 @@ static void dropTimer(const char *reason) {
   Serial.println(reason);
   if (timer.connected()) timer.disconnect();
   connectedToTimer = false;
-  digitalWrite(LED_BUILTIN, LOW);
+  setConnectedLed(false);
 }
 
 static bool connectToTimer(BLEDevice &device) {
@@ -126,7 +135,7 @@ static bool connectToTimer(BLEDevice &device) {
   sendCommand(CMD_MUTE_BEEP);
   waitWithPoll(COMMAND_SETTLE_MS);
 
-  digitalWrite(LED_BUILTIN, HIGH);
+  setConnectedLed(true);
   Serial.println("[Client] Timer link active. Press the button to start.");
   return true;
 }
@@ -193,7 +202,8 @@ void setup() {
 
   pinMode(START_BUTTON_PIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  pinMode(CONNECTED_LED_PIN, OUTPUT);
+  setConnectedLed(false);
 
   if (!BLE.begin()) {
     Serial.println("[Boot] FATAL: BLE init failed.");

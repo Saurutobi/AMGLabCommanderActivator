@@ -25,8 +25,9 @@ These projects can be extended to do various actions, they don't need to just ne
 
 ## How To
 - clone this repo
-- open a `.ino` in Arduino Studio
-- plug in your arduino, select it in the boardmanager
-- edit the timer address to your timer
+- open one of the `.ino` in Arduino Studio
+- plug in your arduino, select it in the boardmanager (screenshot of boardmanager and steps)
+- edit the `TARGET_TIMER_NAME` address to your timer (screenshot)
 - upload the sketch
-- connect button and test
+- connect button to pin 2 and gnd, connect short leg of LED to gnd, long leg of LED to 1kohm resistor, and other side of 1kohm resistor to pin 3 (simple block wiring diagram here)
+- enclose how you wish
