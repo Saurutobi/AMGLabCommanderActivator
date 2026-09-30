@@ -1,8 +1,10 @@
 /*
- * buttonpress_start_withbeep_esp32
+ * buttonpress_start_beepless_esp32
  *
- * Connects to the AMG Lab Commander timer over BLE (Nordic UART Service) and
- * sends "COM START" whenever the start button is pressed.
+ * Connects to the AMG Lab Commander timer over BLE (Nordic UART Service). On
+ * each connection it mutes the beeper ("SET BEEP VOLUME 0"); each button press
+ * then sends "COM START" so the timer starts silently with no added delay.
+ * The volume setting is stored by the timer, so it stays muted afterwards.
  *
  * Board  : classic ESP32 (Tools > Board > esp32 > ESP32 Dev Module).
  * Library: Arduino-ESP32 Bluedroid BLE API (BLEDevice.h), not NimBLE-Arduino.
@@ -40,7 +42,12 @@ static BLEUUID serviceUUID   ("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 static BLEUUID writeCharUUID ("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
 static BLEUUID notifyCharUUID("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
 
-static const char CMD_START[] = "COM START";
+static const char CMD_MUTE_BEEP[] = "SET BEEP VOLUME 0";
+static const char CMD_START[]     = "COM START";
+
+// Spec: SET commands need time to be processed before the next command; 100 ms
+// is sufficient.
+static const unsigned long COMMAND_SETTLE_MS = 100;
 
 // -----------------------------------------------------------------------------
 // Timer BLE client state
@@ -152,6 +159,13 @@ static bool connectToTimer() {
   }
 
   connectedToTimer = true;
+
+  // Mute once per connection so a button press starts the timer immediately.
+  // SET commands are only accepted while the timer is stopped; give it time to
+  // process this before a start can be sent.
+  sendCommand(CMD_MUTE_BEEP);
+  delay(COMMAND_SETTLE_MS);
+
   setConnectedLed(true);
   Serial.println("[Client] Timer link active. Press the button to start.");
   return true;
@@ -200,7 +214,7 @@ void setup() {
   delay(400);
 
   Serial.println();
-  Serial.println("=== BOOT: buttonpress_start_withbeep_esp32 ===");
+  Serial.println("=== BOOT: buttonpress_start_beepless_esp32 ===");
   Serial.printf("Build: %s %s\n", __DATE__, __TIME__);
 
   pinMode(START_BUTTON_PIN, INPUT_PULLUP);
