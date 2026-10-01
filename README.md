@@ -1,10 +1,12 @@
 # AmgLabCommanderActivator
 A set of Arduino apps for use with the AmgLab Commander Timer for use in Practical Competition Shooting sports events.
 
-## Requirements
+## Minimum Equipment Requirements
 - An AmgLab Commander
-- Arduino with Bluetooth. Arduino Nano 33 BLE Rev2 model used to develop project
-- Various microcontroller parts, buttons, relays, powersupplies, etc ***********fill out with stuff
+- Arduino/ESP32 with Bluetooth(code and libraries change by what model you use). [Elegoo ESP-32](https://a.co/d/07qBuuz8) that I used to develop project
+- 1x 1kOhm resistor
+- An LED
+- A button
 
 ## Projects
 ### buttonpress_start_withbeep
@@ -24,14 +26,27 @@ These projects can be extended to do various actions, they don't need to just ne
 
 
 ## How To
-- clone this repo
-- open one of the `.ino` in Arduino Studio
-- plug in your arduino, select it in the boardmanager (screenshot of boardmanager and steps) 
--check libraries and boards installed, install driver if needed most likely need to install CP210x Drivers if not already installed https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads
-- edit the `TARGET_TIMER_NAME` address to your timer (screenshot)
-- upload the sketch
-- connect button to pin 12 and gnd, connect short leg of LED to gnd, long leg of LED to 1kohm resistor, and other side of 1kohm resistor to pin 13 (simple block wiring diagram here)
-- enclose how you wish
+- Clone this repo
+- Open one of the `.ino` in Arduino Studio
+- Install the `esp32 by Expressif Systems` boards under `Board Manager`
+
+![Board manager](docs/boardsmanager.png)
+- Plug in your arduino. Open the device selector and click "select board and port"
+
+![Board manager2](docs/boardsmanager2.png)
+- Find `ESP32 Dev Module` and the COM port of your board.
+
+![Board manager3](docs/boardsmanager3.png)
+- If your board isn't found, you'll need to [install the CP210x Driver](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads)
+- Edit the `TARGET_TIMER_NAME` address to your timer(just the 4 digits) (docs/timeraddress.png)
+- Upload the sketch
+
+![upload](docs/upload.png)
+- Connect a button to `pin 12` and ground. Connect the short leg of an LED to ground. Conned the long leg of the LED to a 1kOhm Resistor and other side of the resistor to `pin 13` (simple block wiring diagram here)
+
+![wiring](docs/wiring.png
+)
+- Put in an enclosure and supply power as you wish
 
 
 

@@ -1,25 +1,10 @@
 /*
- * buttonpress_start_withbeep_esp32
- *
  * Connects to the AMG Lab Commander timer over BLE (Nordic UART Service) and
  * sends "COM START" whenever the start button is pressed.
- *
- * Board  : classic ESP32 (Tools > Board > esp32 > ESP32 Dev Module).
- * Library: Arduino-ESP32 Bluedroid BLE API (BLEDevice.h), not NimBLE-Arduino.
- * Button : GPIO13, active low with the internal pull-up. Wire a push button
- *          between GPIO13 and GND. Avoid GPIO0/2/5/12/15 (boot strapping pins;
- *          GPIO2 also drives the on-board LED on most DevKits and reads LOW).
- * LED    : an external LED on GPIO4 is on while the timer link is active.
- *          Wire GPIO4 -> 1 kOhm resistor -> LED anode (long leg), LED cathode
- *          (short leg) -> GND.
  */
 
 #include <Arduino.h>
 #include "soc/soc_caps.h"
-
-#if !defined(SOC_BLE_SUPPORTED)
-#error "Selected board has no BLE. In Tools > Board choose \"ESP32 Dev Module\" (classic ESP32)."
-#endif
 
 #include <BLEDevice.h>
 #include <BLEUtils.h>

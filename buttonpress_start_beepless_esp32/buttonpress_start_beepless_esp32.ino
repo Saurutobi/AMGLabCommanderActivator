@@ -1,27 +1,11 @@
 /*
- * buttonpress_start_beepless_esp32
- *
  * Connects to the AMG Lab Commander timer over BLE (Nordic UART Service). On
  * each connection it mutes the beeper ("SET BEEP VOLUME 0"); each button press
- * then sends "COM START" so the timer starts silently with no added delay.
- * The volume setting is stored by the timer, so it stays muted afterwards.
- *
- * Board  : classic ESP32 (Tools > Board > esp32 > ESP32 Dev Module).
- * Library: Arduino-ESP32 Bluedroid BLE API (BLEDevice.h), not NimBLE-Arduino.
- * Button : GPIO13, active low with the internal pull-up. Wire a push button
- *          between GPIO13 and GND. Avoid GPIO0/2/5/12/15 (boot strapping pins;
- *          GPIO2 also drives the on-board LED on most DevKits and reads LOW).
- * LED    : an external LED on GPIO4 is on while the timer link is active.
- *          Wire GPIO4 -> 1 kOhm resistor -> LED anode (long leg), LED cathode
- *          (short leg) -> GND.
+ * then sends "COM START" so the timer starts silently.
  */
 
 #include <Arduino.h>
 #include "soc/soc_caps.h"
-
-#if !defined(SOC_BLE_SUPPORTED)
-#error "Selected board has no BLE. In Tools > Board choose \"ESP32 Dev Module\" (classic ESP32)."
-#endif
 
 #include <BLEDevice.h>
 #include <BLEUtils.h>
