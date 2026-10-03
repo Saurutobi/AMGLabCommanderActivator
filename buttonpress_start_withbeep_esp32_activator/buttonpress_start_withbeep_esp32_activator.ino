@@ -1,6 +1,10 @@
 /*
  * Connects to the AMG Lab Commander timer over BLE (Nordic UART Service) and
  * sends "COM START" whenever the start button is pressed.
+ *
+ * Activator: ACTIVATOR_DELAY_MS after each button press, ACTIVATOR_TRIGGER_PIN
+ * goes HIGH for ACTIVATOR_HOLD_MS, then back LOW. A new press while a delay
+ * is pending restarts the delay.
  */
 
 #include <Arduino.h>
@@ -21,6 +25,12 @@ static const unsigned long BUTTON_DEBOUNCE_MS = 50;
 
 static const uint8_t CONNECTED_LED_PIN = 13;
 
+// GPIO27 is not a boot strapping pin and stays quiet during boot, so whatever
+// it drives will not fire on power-up.
+static const uint8_t ACTIVATOR_TRIGGER_PIN = 27;
+static const unsigned long ACTIVATOR_DELAY_MS = 5000;  // press -> pin HIGH
+static const unsigned long ACTIVATOR_HOLD_MS  = 1000;  // how long it stays HIGH
+
 static BLEUUID serviceUUID   ("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 static BLEUUID writeCharUUID ("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
 static BLEUUID notifyCharUUID("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
@@ -36,6 +46,14 @@ static BLERemoteCharacteristic *pNotifyChar = nullptr;
 static BLEAddress *targetDeviceAddress = nullptr;
 static volatile bool connectedToTimer = false;
 static volatile bool haveAddress      = false;
+
+// -----------------------------------------------------------------------------
+// Activator state
+// -----------------------------------------------------------------------------
+static bool activatorPending = false;
+static bool activatorActive  = false;
+static unsigned long activatorArmedAt = 0;
+static unsigned long activatorOnAt    = 0;
 
 // -----------------------------------------------------------------------------
 // BLE callbacks — flags only; no nested BLE operations
@@ -153,6 +171,36 @@ static void sendCommand(const char *command) {
 }
 
 // -----------------------------------------------------------------------------
+// Activator (non-blocking, driven from loop())
+// -----------------------------------------------------------------------------
+static void setActivator(bool on) {
+  digitalWrite(ACTIVATOR_TRIGGER_PIN, on ? HIGH : LOW);
+  activatorActive = on;
+}
+
+static void scheduleActivator(unsigned long now) {
+  if (activatorActive) setActivator(false);
+  activatorPending = true;
+  activatorArmedAt = now;
+  Serial.printf("[Activator] Armed; pin %u HIGH in %lu ms.\n",
+                ACTIVATOR_TRIGGER_PIN, ACTIVATOR_DELAY_MS);
+}
+
+static void serviceActivator(unsigned long now) {
+  if (activatorPending && now - activatorArmedAt >= ACTIVATOR_DELAY_MS) {
+    activatorPending = false;
+    activatorOnAt = now;
+    setActivator(true);
+    Serial.println("[Activator] Trigger pin HIGH.");
+  }
+
+  if (activatorActive && now - activatorOnAt >= ACTIVATOR_HOLD_MS) {
+    setActivator(false);
+    Serial.println("[Activator] Trigger pin LOW.");
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Start button (debounced, fires once per press). Starts out assuming the
 // button is held, so a press only counts after a release has been seen; a
 // stuck-low or miswired pin can never start the timer on its own.
@@ -191,11 +239,17 @@ void setup() {
   pinMode(START_BUTTON_PIN, INPUT_PULLUP);
   pinMode(CONNECTED_LED_PIN, OUTPUT);
   setConnectedLed(false);
+  pinMode(ACTIVATOR_TRIGGER_PIN, OUTPUT);
+  setActivator(false);
 
   BLEDevice::init("current_starter");
 }
 
 void loop() {
+  // Runs before the connection check so a pending trigger still completes if
+  // the timer link drops.
+  serviceActivator(millis());
+
   if (!connectedToTimer) {
     // The disconnect callback runs on the BLE task; update the LED here.
     setConnectedLed(false);
@@ -216,6 +270,7 @@ void loop() {
 
   if (startButtonPressed()) {
     sendCommand(CMD_START);
+    scheduleActivator(millis());
   }
 
   delay(5);
