@@ -44,9 +44,5 @@ These projects can be extended to do various actions, they don't need to just ne
 ![upload](docs/upload.png)
 - Connect a button to `pin 12` and ground. Connect the short leg of an LED to ground. Conned the long leg of the LED to a 1kOhm Resistor and other side of the resistor to `pin 13` (simple block wiring diagram here)
 
-![wiring](docs/wiring.png
-)
+![wiring](docs/wiring.png)
 - Put in an enclosure and supply power as you wish
-
-
-
