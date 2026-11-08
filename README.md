@@ -37,7 +37,7 @@ These projects can be extended to do various actions, they don't need to just ne
 - Find `ESP32 Dev Module` and the COM port of your board.
 
 ![Board manager3](docs/boardsmanager3.png)
-- If your board isn't found, you'll need to [install the CP210x Driver](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads)
+- If your board isn't found, you'll need to [install the CP210x Driver (Not the Universal One)](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads)
 - Edit the `TARGET_TIMER_NAME` address to your timer(just the 4 digits) (docs/timeraddress.png)
 - Upload the sketch
 

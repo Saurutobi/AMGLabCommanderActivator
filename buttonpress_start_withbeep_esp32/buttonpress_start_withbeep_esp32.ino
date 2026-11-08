@@ -14,7 +14,7 @@
 // -----------------------------------------------------------------------------
 // Configuration
 // -----------------------------------------------------------------------------
-static const char *TARGET_TIMER_NAME = "AMG Lab COMM 1D8D";
+static const char *TARGET_TIMER_NAME = "AMG Lab COMM BD75";
 
 static const uint8_t START_BUTTON_PIN = 12;
 static const unsigned long BUTTON_DEBOUNCE_MS = 50;
